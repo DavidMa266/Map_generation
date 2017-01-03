@@ -8,6 +8,8 @@
 double fade(double t) {return t * t * t * (t * (t * 6 - 15) + 10);}
 double lerp(double a, double b, double x) {return a + x * (b - a);}
 
+
+
 //Produces a random array, sized 512 of elements 0-255
 vector<int> random_arr(int num)
 {
@@ -52,7 +54,19 @@ vector<vector<vector<int> > > gradient_arr(int square_num)
 
 vector<vector<double> > quadratic_gradient(int len)
 {
-
+	vector<vector<double> > res(len);
+	for(int i = 0; i < len; i++)
+	{
+		vector<double> tmp(len);
+		res[i] = tmp;
+		for(int j = 0; j < len; j++)
+		{
+			double x = (double) i / len - 0.5;
+			double y = (double) j / len - 0.5;
+			res[i][j] = x * x + y * y;
+		}
+	}
+	return res;
 }
 
 
@@ -100,16 +114,12 @@ vector<vector<double> > improved_perlin_noise(int len, int square_num, vector<in
 {
 	int size = len;
 	vector<int> p = ps;
-
-	vector<vector<double> > gradient_map(size);
-	for(int i = 0; i < size; i++)
-	{
-		vector<double> x(size);
-		gradient_map[i] = x;
-	}
+	vector<vector<double> > gradient_map (size);
 
 	for(int i = 0; i < size; i++)
 	{
+		vector<double> tmp(size);
+		gradient_map[i] = tmp;
 		for(int j = 0; j < size; j++)
 		{
 			gradient_map[i][j] = improved_perlin(((double) i) / size*square_num, ((double)j) / size*square_num, p);
@@ -129,12 +139,12 @@ vector<vector<double> > improved_perlin_noise(int len, int square_num)
 
 
 
-vector<vector<double> > improved_octave(int len, int square_num)
+vector<vector<double> > improved_octave(int len, int square_num, int lim)
 {
 	vector<vector<double> > res = improved_perlin_noise(len, square_num);
 	int snum = square_num;
 	int index = 1;
-	while(snum < len/8)
+	while(snum < len/lim)
 	{
 		snum *= 2;
 		vector<vector<double> > octave = improved_perlin_noise(len, snum);
@@ -153,21 +163,39 @@ vector<vector<double> > improved_octave(int len, int square_num)
 	return res;
 }
 
-
+vector<vector<double> > island_perlin(int len, int square_num, int lim)
+{
+	vector<vector<double> > octave = improved_octave(len, square_num, lim);
+	vector<vector<double> > gradient = quadratic_gradient(len);
+	for(int i = 0; i < len; i++)
+	{
+		for(int j = 0; j < len; j++)
+		{
+			octave[i][j] -= gradient[i][j];
+			//I can apply different functions to make it look cooler!!!!
+			//A cube function for example, can make more land
+		}
+	}
+	return octave;
+}
 
 
 int main(){
 
 	int len = 256;
 	int square_num = 4;
+	int lim = 16;
 	ofstream myfile;
-	myfile.open ("data_256_4.csv");
-	vector<vector<double> > x = improved_octave(len, square_num);
+	myfile.open ("data-island3.csv");
+	vector<vector<double> > x = island_perlin(len, square_num, lim);
 	for(int i = 0; i < len; i++)
 	{
 		for(int j = 0; j < len; j++)
 		{
-			myfile << i << "," << j << "," << x[i][j] << endl;
+			if(x[i][j] < 0.3)
+				myfile << i << "," << j << "," << 0 << endl;
+			else
+				myfile << i << "," << j << "," << 1 << endl;
 		}
 	}
 	myfile.close();
