@@ -12,10 +12,3 @@ int r_direction(int r, int dir);
 
 
 Hex get_hex(Hex origin, int dir);
-
-
-
-vector<vector<double> > perlin_noise(int n);
-vector<vector<int> >  map_generator(int width, int height, int num_seeds);
-
-vector<vector<int> > fortune_line_sweep(int dim, int num);
