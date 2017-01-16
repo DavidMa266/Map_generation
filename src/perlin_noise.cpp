@@ -3,11 +3,13 @@
 #include <time.h>
 #include <iostream>
 #include <fstream>
-
+#include <math.h>
+#include "..\include\GL\glew.h"
+#include "..\include\GL\glut.h"
 
 double fade(double t) {return t * t * t * (t * (t * 6 - 15) + 10);}
 double lerp(double a, double b, double x) {return a + x * (b - a);}
-
+double screen_coordinate(int value, int size) {return (double)value / size * 2 - 1;}
 
 
 //Produces a random array, sized 512 of elements 0-255
@@ -63,7 +65,7 @@ vector<vector<double> > quadratic_gradient(int len)
 		{
 			double x = (double) i / len - 0.5;
 			double y = (double) j / len - 0.5;
-			res[i][j] = x * x + y * y;
+			res[i][j] = sqrt(x * x + y * y);
 		}
 	}
 	return res;
@@ -180,23 +182,41 @@ vector<vector<double> > island_perlin(int len, int square_num, int lim)
 }
 
 
-int main(){
+void func()
+{
 
 	int len = 256;
 	int square_num = 4;
 	int lim = 16;
+	vector<vector<double> > x = island_perlin(len, square_num, lim);
+}
+
+void init(int argc, char **argv)
+{
+	glutInit(&argc, argv);
+	glutInitWindowPosition(500,500);
+	glutInitWindowSize(1024,1024);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_SINGLE);
+	char name[] = "hello";
+	glutCreateWindow(name);
+	glutDisplayFunc(func);
+	glutMainLoop();
+}
+
+void make_map()
+{
+	int len = 256;
+	int square_num = 4;
+	int lim = 16;
 	ofstream myfile;
-	myfile.open ("data-island3.csv");
+	myfile.open ("data-island.csv");
 	vector<vector<double> > x = island_perlin(len, square_num, lim);
 	for(int i = 0; i < len; i++)
 	{
 		for(int j = 0; j < len; j++)
 		{
-			if(x[i][j] < 0.3)
-				myfile << i << "," << j << "," << 0 << endl;
-			else
-				myfile << i << "," << j << "," << 1 << endl;
+			myfile << i << "," << j << "," << x[i][j] << endl;
 		}
 	}
-	myfile.close();
 }
+
