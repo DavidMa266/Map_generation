@@ -39,13 +39,3 @@ Map* line_sweep(vector<XY*> centers, int iteration)
 */
 	return new Map(); 
 }
-
-int main()
-{
-
-	vector<XY*> centers;
-	XY* x = new XY(1,2);
-	centers.push_back(x);
-	Map* map = line_sweep(centers, 1);
-
-}

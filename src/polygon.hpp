@@ -15,10 +15,10 @@ class Tree;
 class XY
 {
 	public:
-		int x;
-		int y;
+		double x;
+		double y;
 		bool operator==(const XY &xy) const {return (xy.x==this->x && xy.y==this->y);}
-		XY(int x, int y) : x(x), y(y){}
+		XY(double x, double y) : x(x), y(y){}
 };
 
 namespace std {
@@ -105,10 +105,9 @@ class Tree
 {
 	public:
 		Node* root;
-		insert(Polygon* arc);
-		remove(XY xy);
+		void insert(Polygon* arc);
 		Tree() : root(NULL) {}
 };
 
-
+void recompute_breakpoints(Node* node, int y);
 bool YCompare(XY xy1, XY xy2);

@@ -1,6 +1,8 @@
 #include "polygon.hpp"
 #include <unordered_map>
 #include <iostream>
+#include <math.h>
+#include <stdio.h>
 
 void Edge::assign_opposite(Edge* opp)
 {
@@ -57,7 +59,49 @@ Node* new_node(Polygon* left_poly, Polygon* right_poly, Node* left, Node* right)
 	return node;
 }
 
-Tree::insert(Polygon* arc)
+
+void compute_breakpoints(double _a, double _b, double _c, double _d, double yline)
+{
+/*	if(node->left != NULL){
+		recompute_breakpoints(node->left, yline);
+	}
+	if(node->right != NULL)
+	{
+		recompute_breakpoints(node->right, yline);
+	}*/
+	double resx, resy;
+	//Normalize coordinates so yline is essentailly '0'
+/*	double a = node->l_polygon->xy->x;
+	double b = yline - node->l_polygon->xy->y;
+
+	double c = node->r_polygon->xy->x;
+	double d = yline- node->r_polygon->xy->y;
+*/
+	double a,b,c,d;
+	a = _a;
+	b = yline-_b;
+	c = _c;
+	d = yline-_d;
+
+	if(d == b)
+		resx = (a + c) / 2;
+	else if(d == yline)
+		resx = c;
+	else if(b == yline){
+		resx = a;
+	}
+	else{
+		double ax = d-b;
+		double bx = -2 * (a*d - c*b);
+		double cx = d * (a * a + b * b) - b * (c * c + d * d);
+		resx = (-1 * bx + (sqrt(bx * bx - 4 * ax * cx))) / (2* ax);
+	}
+	cout << "X " << resx << endl;
+}
+
+
+//Whenever we insert, we must first iterate and update all breakpoint values.
+void Tree::insert(Polygon* arc)
 {
 	Node* current_node = root;
 	XY* xy = arc->xy;
@@ -113,3 +157,7 @@ bool YCompare(XY xy1, XY xy2)
 }
 
 
+int main()
+{
+	compute_breakpoints(3, 4, 1, 7, 8);
+}
